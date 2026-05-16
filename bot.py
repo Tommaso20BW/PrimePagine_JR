@@ -27,12 +27,15 @@ def invia_album():
         f"{LINK_CORRIERE}?v={anti_cache}"
     ]
     
-    # Didascalia originale con le tue emoji
+    # Costruzione della didascalia speculare al tuo JSON:
+    # - Giornale e Sole attaccati senza spazi intermedi
+    # - Spazio prima di PRIME PAGINE
+    # - Nessun tag <u> sotto la menzione (lasciamo solo il tag per la menzione o testo semplice visto che Telegram la riconosce in automatico)
     didascalia = (
         f'<tg-emoji emoji-id="5433982607035474385">📰</tg-emoji>'
         f'<tg-emoji emoji-id="5469947168523558652">☀️</tg-emoji> '
         f'<b>PRIME PAGINE | {data_oggi}</b>\n\n'
-        f'<tg-emoji emoji-id="5985659276327132147">👉</tg-emoji> <u>@Juventus_Reborn</u>'
+        f'<tg-emoji emoji-id="5985659276327132147">👉</tg-emoji> @Juventus_Reborn'
     )
 
     media = []
@@ -56,7 +59,7 @@ def invia_album():
         risposta = requests.post(url_telegram, json=payload)
         
         if risposta.status_code == 200:
-            print("Album inviato correttamente.")
+            print("Album inviato con la struttura esatta del JSON!")
         else:
             print(f"Errore restituito da Telegram: {risposta.text}")
             
