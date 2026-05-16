@@ -2,9 +2,9 @@ name: Invia Prime Pagine Giornaliere
 
 on:
   schedule:
-    # 05:00 UTC corrisponde alle 07:00 italiane (con l'ora legale attuale)
-    - cron: '0 5 * * *'
-  workflow_dispatch: # Ti permette sempre di avviarlo a mano per fare test
+    # 03:08 UTC corrisponde alle 05:08 italiane
+    - cron: '10 3 * * *'
+  workflow_dispatch:
 
 jobs:
   run-bot:
