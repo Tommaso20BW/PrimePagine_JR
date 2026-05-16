@@ -2,9 +2,11 @@ import os
 import requests
 from datetime import datetime
 
+# Configurazione (Prende i dati dalle variabili d'ambiente)
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
+# Lista invertita: Tuttosport ora è la prima immagine
 PRIME_PAGINE = [
     "https://cdn.tuttosport.com/next/img/edizioni/ts/prima-pagina-naz-810x1189.jpg",
     "https://images2.gazzettaobjects.it/images/primepagine/gazzettafc_nazionale_web-Big.jpg",
@@ -13,14 +15,12 @@ PRIME_PAGINE = [
 
 def invia_album():
     url_telegram = f"https://api.telegram.org/bot{TOKEN}/sendMediaGroup"
+    
+    # Genera la data di oggi
     data_oggi = datetime.now().strftime("%d/%m/%Y")
     
-    # Costruiamo il testo usando la sintassi <tg-emoji id="..."></tg-emoji> per le emoji personalizzate
-    didascalia = (
-        f'<tg-emoji id="5433982607035474385">📰</tg-emoji> '
-        f'<b>PRIME PAGINE | {data_oggi}</b>\n\n'
-        f'<tg-emoji id="5985659276327132147">👉</tg-emoji> <u>@Juventus_Reborn</u>'
-    )
+    # Didascalia
+    didascalia = f"📆📰 <b>PRIME PAGINE | {data_oggi}</b>\n\n👉 <u>@Juventus_Reborn</u>"
 
     media = []
     for i, url in enumerate(PRIME_PAGINE):
@@ -28,9 +28,10 @@ def invia_album():
             "type": "photo",
             "media": url
         }
+        # La didascalia viene agganciata al primo elemento della lista (ora Tuttosport)
         if i == 0:
             oggetto_foto["caption"] = didascalia
-            oggetto_foto["parse_mode"] = "HTML" # Obbligatorio per far funzionare i tag tg-emoji
+            oggetto_foto["parse_mode"] = "HTML"
             
         media.append(oggetto_foto)
 
@@ -41,10 +42,12 @@ def invia_album():
     
     try:
         risposta = requests.post(url_telegram, json=payload)
+        
         if risposta.status_code == 200:
-            print("Album inviato con successo!")
+            print("Album inviato con successo con Tuttosport in testa!")
         else:
-            print(f"Errore: {risposta.text}")
+            print(f"Errore nell'invio dell'album: {risposta.text}")
+            
     except Exception as e:
         print(f"Errore di connessione: {e}")
 
