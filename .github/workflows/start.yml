@@ -2,8 +2,9 @@ name: Invia Prime Pagine Giornaliere
 
 on:
   schedule:
-    - cron: '0 4 * * *'
-
+    - cron: '55 3 * * *'
+  workflow_dispatch:
+  
 jobs:
   run-bot:
     runs-on: ubuntu-latest
