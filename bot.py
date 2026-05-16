@@ -19,7 +19,7 @@ def invia_album():
     # Genera la data di oggi
     data_oggi = datetime.now().strftime("%d/%m/%Y")
     
-    # Didascalia senza l'emoji del calendario
+    # Didascalia speculare al tuo ultimo JSON (senza calendario e con spazi corretti)
     didascalia = (
         f'<tg-emoji id="5433982607035474385">📰</tg-emoji> '
         f'<b>PRIME PAGINE | {data_oggi}</b>\n\n'
