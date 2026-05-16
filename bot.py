@@ -6,7 +6,7 @@ from datetime import datetime
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-# Lista invertita: Tuttosport ora è la prima immagine
+# Lista con Tuttosport in testa
 PRIME_PAGINE = [
     "https://cdn.tuttosport.com/next/img/edizioni/ts/prima-pagina-naz-810x1189.jpg",
     "https://images2.gazzettaobjects.it/images/primepagine/gazzettafc_nazionale_web-Big.jpg",
@@ -19,8 +19,13 @@ def invia_album():
     # Genera la data di oggi
     data_oggi = datetime.now().strftime("%d/%m/%Y")
     
-    # Didascalia
-    didascalia = f"📆📰 <b>PRIME PAGINE | {data_oggi}</b>\n\n👉 <u>@Juventus_Reborn</u>"
+    # Didascalia con la sintassi corretta tg-emoji e gli ID del tuo JSON
+    didascalia = (
+        f'<tg-emoji id="5431897022456145283">📆</tg-emoji>'
+        f'<tg-emoji id="5433982607035474385">📰</tg-emoji> '
+        f'<b>PRIME PAGINE | {data_oggi}</b>\n\n'
+        f'<tg-emoji id="5985659276327132147">👉</tg-emoji> <u>@Juventus_Reborn</u>'
+    )
 
     media = []
     for i, url in enumerate(PRIME_PAGINE):
@@ -28,7 +33,7 @@ def invia_album():
             "type": "photo",
             "media": url
         }
-        # La didascalia viene agganciata al primo elemento della lista (ora Tuttosport)
+        # Applichiamo la didascalia speciale a Tuttosport (primo elemento)
         if i == 0:
             oggetto_foto["caption"] = didascalia
             oggetto_foto["parse_mode"] = "HTML"
@@ -44,9 +49,10 @@ def invia_album():
         risposta = requests.post(url_telegram, json=payload)
         
         if risposta.status_code == 200:
-            print("Album inviato con successo con Tuttosport in testa!")
+            print("Album inviato con successo con emoji personalizzate!")
         else:
-            print(f"Errore nell'invio dell'album: {risposta.text}")
+            print(f"Errore restituito da Telegram: {risposta.text}")
+            print("Nota: Se l'errore persiste, il canale potrebbe non avere abbastanza Boost per le emoji personalizzate.")
             
     except Exception as e:
         print(f"Errore di connessione: {e}")
