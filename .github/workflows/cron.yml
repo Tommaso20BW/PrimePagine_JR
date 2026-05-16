@@ -1,0 +1,29 @@
+name: Invia Prime Pagine Giornaliere
+
+on:
+  schedule:
+    # 05:00 UTC corrisponde alle 07:00 italiane (con l'ora legale attuale)
+    - cron: '0 5 * * *'
+  workflow_dispatch: # Ti permette sempre di avviarlo a mano per fare test
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout del codice
+      uses: actions/checkout@v3
+
+    - name: Configura Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Installa dipendenze
+      run: |
+        pip install -r requirements.txt
+
+    - name: Esegui il Bot
+      env:
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: python bot.py
