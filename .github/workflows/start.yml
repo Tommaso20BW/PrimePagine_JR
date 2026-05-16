@@ -3,7 +3,7 @@ name: Invia Prime Pagine Giornaliere
 on:
   schedule:
     # Impostiamo il bot direttamente sull'orario italiano!
-    - cron: '32 11 * * *'
+    - cron: '32 4 * * *'
       timezone: 'Europe/Rome'
   workflow_dispatch:
 
