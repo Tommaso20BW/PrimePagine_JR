@@ -27,7 +27,7 @@ def invia_album():
         f"{LINK_CORRIERE}?v={anti_cache}"
     ]
     
-    # Nuova didascalia speculare al tuo JSON (Giornale + Sole + Tutto il titolo in Grassetto)
+    # Didascalia originale con le tue emoji
     didascalia = (
         f'<tg-emoji emoji-id="5433982607035474385">📰</tg-emoji>'
         f'<tg-emoji emoji-id="5469947168523558652">☀️</tg-emoji> '
@@ -56,7 +56,7 @@ def invia_album():
         risposta = requests.post(url_telegram, json=payload)
         
         if risposta.status_code == 200:
-            print("Album aggiornato con nuova grafica inviato con successo!")
+            print("Album inviato correttamente.")
         else:
             print(f"Errore restituito da Telegram: {risposta.text}")
             
