@@ -19,9 +19,8 @@ def invia_album():
     # Genera la data di oggi
     data_oggi = datetime.now().strftime("%d/%m/%Y")
     
-    # Didascalia con la sintassi corretta tg-emoji e gli ID del tuo JSON
+    # Didascalia senza l'emoji del calendario
     didascalia = (
-        f'<tg-emoji id="5431897022456145283">📆</tg-emoji>'
         f'<tg-emoji id="5433982607035474385">📰</tg-emoji> '
         f'<b>PRIME PAGINE | {data_oggi}</b>\n\n'
         f'<tg-emoji id="5985659276327132147">👉</tg-emoji> <u>@Juventus_Reborn</u>'
@@ -33,7 +32,6 @@ def invia_album():
             "type": "photo",
             "media": url
         }
-        # Applichiamo la didascalia speciale a Tuttosport (primo elemento)
         if i == 0:
             oggetto_foto["caption"] = didascalia
             oggetto_foto["parse_mode"] = "HTML"
@@ -49,10 +47,9 @@ def invia_album():
         risposta = requests.post(url_telegram, json=payload)
         
         if risposta.status_code == 200:
-            print("Album inviato con successo con emoji personalizzate!")
+            print("Album inviato con successo!")
         else:
             print(f"Errore restituito da Telegram: {risposta.text}")
-            print("Nota: Se l'errore persiste, il canale potrebbe non avere abbastanza Boost per le emoji personalizzate.")
             
     except Exception as e:
         print(f"Errore di connessione: {e}")
