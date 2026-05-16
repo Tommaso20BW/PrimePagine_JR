@@ -19,11 +19,11 @@ def invia_album():
     # Genera la data di oggi
     data_oggi = datetime.now().strftime("%d/%m/%Y")
     
-    # Didascalia speculare al tuo ultimo JSON (senza calendario e con spazi corretti)
+    # Didascalia configurata con l'attributo corretto: emoji-id
     didascalia = (
-        f'<tg-emoji id="5433982607035474385">📰</tg-emoji> '
+        f'<tg-emoji emoji-id="5433982607035474385">📰</tg-emoji> '
         f'<b>PRIME PAGINE | {data_oggi}</b>\n\n'
-        f'<tg-emoji id="5985659276327132147">👉</tg-emoji> <u>@Juventus_Reborn</u>'
+        f'<tg-emoji emoji-id="5985659276327132147">👉</tg-emoji> <u>@Juventus_Reborn</u>'
     )
 
     media = []
@@ -47,7 +47,7 @@ def invia_album():
         risposta = requests.post(url_telegram, json=payload)
         
         if risposta.status_code == 200:
-            print("Album inviato con successo!")
+            print("Album inviato con successo con emoji custom!")
         else:
             print(f"Errore restituito da Telegram: {risposta.text}")
             
