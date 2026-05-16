@@ -27,15 +27,11 @@ def invia_album():
         f"{LINK_CORRIERE}?v={anti_cache}"
     ]
     
-    # Costruzione della didascalia speculare al tuo JSON:
-    # - Giornale e Sole attaccati senza spazi intermedi
-    # - Spazio prima di PRIME PAGINE
-    # - Nessun tag <u> sotto la menzione (lasciamo solo il tag per la menzione o testo semplice visto che Telegram la riconosce in automatico)
+    # Costruzione della didascalia con emoji standard (senza tag tg-emoji)
     didascalia = (
-        f'<tg-emoji emoji-id="5433982607035474385">📰</tg-emoji>'
-        f'<tg-emoji emoji-id="5469947168523558652">☀️</tg-emoji> '
+        f'📰☀️ '
         f'<b>PRIME PAGINE | {data_oggi}</b>\n\n'
-        f'<tg-emoji emoji-id="5985659276327132147">👉</tg-emoji> @Juventus_Reborn'
+        f'👉 @Juventus_Reborn'
     )
 
     media = []
