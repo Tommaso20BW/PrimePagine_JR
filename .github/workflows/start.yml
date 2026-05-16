@@ -1,9 +1,8 @@
 name: Invia Prime Pagine Giornaliere
 
-on:
   schedule:
-    - cron: '55 3 * * *'
-  workflow_dispatch:
+    # 03:57 UTC = 05:57 Italiane (con ora legale)
+    - cron: '57 3 * * *'
 
 jobs:
   run-bot:
