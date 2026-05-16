@@ -2,8 +2,8 @@ name: Invia Prime Pagine Giornaliere
 
 on:
   schedule:
-    # 04:00 UTC = 06:00 in Italia (ora legale)
-    - cron: '0 4 * * *'
+    # 03:55 UTC = 05:55 in Italia (ora legale)
+    - cron: '55 3 * * *'
   workflow_dispatch:
 
 jobs:
