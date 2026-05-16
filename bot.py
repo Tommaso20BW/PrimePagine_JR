@@ -6,9 +6,9 @@ TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 PRIME_PAGINE = [
+    "https://cdn.tuttosport.com/next/img/edizioni/ts/prima-pagina-naz-810x1189.jpg",
     "https://images2.gazzettaobjects.it/images/primepagine/gazzettafc_nazionale_web-Big.jpg",
-    "https://cdn.corrieredellosport.it/next/img/edizioni/cds/prima-pagina-naz-810x1189.jpg",
-    "https://cdn.tuttosport.com/next/img/edizioni/ts/prima-pagina-naz-810x1189.jpg"
+    "https://cdn.corrieredellosport.it/next/img/edizioni/cds/prima-pagina-naz-810x1189.jpg"
 ]
 
 def invia_album():
@@ -17,7 +17,6 @@ def invia_album():
     
     # Costruiamo il testo usando la sintassi <tg-emoji id="..."></tg-emoji> per le emoji personalizzate
     didascalia = (
-        f'<tg-emoji id="5431897022456145283">📆</tg-emoji>'
         f'<tg-emoji id="5433982607035474385">📰</tg-emoji> '
         f'<b>PRIME PAGINE | {data_oggi}</b>\n\n'
         f'<tg-emoji id="5985659276327132147">👉</tg-emoji> <u>@Juventus_Reborn</u>'
