@@ -1,9 +1,8 @@
 name: Invia Prime Pagine Giornaliere
 
+name: Invia Prime Pagine Giornaliere
+
 on:
-  schedule:
-    - cron: '32 4 * * *'
-      timezone: 'Europe/Rome'
   workflow_dispatch:
 
 permissions:
