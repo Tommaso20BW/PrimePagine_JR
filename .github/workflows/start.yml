@@ -1,7 +1,5 @@
 name: Invia Prime Pagine Giornaliere
 
-name: Invia Prime Pagine Giornaliere
-
 on:
   workflow_dispatch:
 
