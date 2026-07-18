@@ -1,7 +1,37 @@
 import os
 import requests
 import random
+import time
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
+# Orario esatto (ora italiana) in cui il messaggio deve partire.
+# Il workflow puo' avviarsi qualche minuto prima (buffer anti-ritardo GitHub Actions):
+# lo script aspetta comunque fino a questo orario preciso prima di inviare.
+ORA_INVIO = (7, 0)  # (ore, minuti) - modifica qui se vuoi cambiare orario
+FUSO_ORARIO = ZoneInfo("Europe/Rome")
+
+
+def attendi_orario_preciso(ora, minuto, fuso, margine_massimo_minuti=15):
+    """Aspetta fino a ora:minuto (ora italiana). Se il workflow parte in ritardo
+    oltre il margine massimo, invia subito senza aspettare oltre."""
+    ora_corrente = datetime.now(fuso)
+    target = ora_corrente.replace(hour=ora, minute=minuto, second=0, microsecond=0)
+
+    secondi_attesa = (target - ora_corrente).total_seconds()
+
+    if secondi_attesa <= 0:
+        # Siamo gia' arrivati o superato l'orario target: invia subito.
+        return
+
+    if secondi_attesa > margine_massimo_minuti * 60:
+        # Il job e' partito troppo presto rispetto al previsto: non ha senso
+        # aspettare cosi' a lungo, si invia subito per evitare blocchi assurdi.
+        print(f"Attesa di {secondi_attesa/60:.1f} minuti fuori dal margine, invio subito.")
+        return
+
+    print(f"Attendo {secondi_attesa:.0f} secondi per raggiungere le {ora:02d}:{minuto:02d} ora italiana...")
+    time.sleep(secondi_attesa)
 
 # Configurazione (Prende i dati dalle variabili d'ambiente)
 TOKEN = os.getenv("TELEGRAM_TOKEN")
@@ -63,4 +93,5 @@ def invia_album():
         print(f"Errore di connessione: {e}")
 
 if __name__ == "__main__":
+    attendi_orario_preciso(ORA_INVIO[0], ORA_INVIO[1], FUSO_ORARIO)
     invia_album()
