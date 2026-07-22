@@ -1,145 +1,100 @@
-<div align="center">
-
 # 📰☀️ PrimePagine JR
 
-**Bot Telegram che pubblica in automatico le prime pagine dei principali quotidiani sportivi italiani.**
+Bot Telegram che pubblica in un unico album le prime pagine di:
 
-Semplice, leggero, senza dipendenze esterne né API key: gira interamente su **GitHub Actions**.
+- Tuttosport;
+- La Gazzetta dello Sport;
+- Corriere dello Sport.
 
-`Python 3.12` · `requests` · `Telegram Bot API` · `GitHub Actions`
-
-</div>
-
------
-
-## Indice
-
-- [Cos’è](#cosè)
-- [Come funziona](#come-funziona)
-- [Funzionalità](#funzionalità)
-- [Sorgenti immagini](#sorgenti-immagini)
-- [Formato del messaggio](#formato-del-messaggio)
-- [Struttura del repository](#struttura-del-repository)
-- [Configurazione](#configurazione)
-- [Avvio](#avvio)
-- [Stack tecnico](#stack-tecnico)
-
------
-
-## Cos’è
-
-PrimePagine JR recupera ogni giorno le immagini delle prime pagine di Tuttosport, Gazzetta dello Sport e Corriere dello Sport direttamente dai rispettivi CDN ufficiali, le raggruppa in un **album fotografico** e le invia al canale Telegram **@Juventus_Reborn** con la data del giorno.
-
------
+Le immagini vengono referenziate direttamente dai CDN dei quotidiani; il bot non le salva nel repository.
 
 ## Come funziona
 
-```
-                ┌──────────────────────┐
-                │   GitHub Actions      │  ← avvio manuale o cron giornaliero
-                │       start.yml       │
-                └──────────┬───────────┘
-                           │
-                           ▼
-        ┌──────────────────────────────────────┐
-        │                bot.py                 │
-        │  1. costruisce gli URL anti-cache     │
-        │  2. scarica le 3 prime pagine         │
-        │  3. invia l'album con didascalia      │
-        └───────────────┬──────────┬─────────────┘
-                        │          │
-                        ▼          ▼
-                  ┌─────────────┐  ┌──────────┐
-                  │     CDN     │  │ Telegram │
-                  │ quotidiani  │  │ (output) │
-                  │ TS·GdS·CdS  │  │          │
-                  └─────────────┘  └──────────┘
+1. Se il processo parte nei 15 minuti precedenti le **07:00 (Europe/Rome)**, attende l’orario esatto. Se parte prima, dopo o con un ritardo maggiore, procede subito.
+2. Costruisce i tre URL delle copertine aggiungendo un parametro anti-cache basato su data, ora e un numero casuale.
+3. Prepara un album Telegram con `sendMediaGroup`.
+4. Inserisce sulla prima foto una didascalia HTML con la data corrente e `@Juventus_Reborn`.
+5. Invia le immagini nell’ordine Tuttosport, Gazzetta, Corriere.
+
+```text
+GitHub Actions / esecuzione locale
+                │
+                ▼
+              bot.py
+        ┌───────┼────────┐
+        ▼       ▼        ▼
+   Tuttosport Gazzetta Corriere CDN
+        └───────┼────────┘
+                ▼
+       Telegram sendMediaGroup
 ```
 
-Lo script è volutamente minimale: meno di 60 righe di Python. Costruisce per ogni quotidiano un URL con un parametro anti-cache, scarica le tre immagini dai CDN pubblici e le inoltra a Telegram come unico album tramite `sendMediaGroup`, con la didascalia sulla prima foto.
+## Sorgenti
 
------
+| Quotidiano | Host |
+|---|---|
+| Tuttosport | `cdn.tuttosport.com` |
+| La Gazzetta dello Sport | `images2.gazzettaobjects.it` |
+| Corriere dello Sport | `cdn.corrieredellosport.it` |
 
-## Funzionalità
+Gli URL sono definiti come costanti in `bot.py` e possono essere aggiornati se i quotidiani cambiano percorso.
 
-- **Tre quotidiani in un colpo solo** — Tuttosport, Gazzetta dello Sport e Corriere dello Sport inviati come album unico.
-- **Anti-cache automatico** — ogni URL viene reso unico aggiungendo un parametro `?v=` basato su data/ora e numero casuale, per forzare il download dell’immagine più recente invece di quella cachata.
-- **Album Telegram** — le tre prime pagine vengono inviate come `sendMediaGroup` con la didascalia sulla prima immagine.
-- **Nessuna API key richiesta** — le immagini vengono scaricate direttamente dai CDN pubblici dei quotidiani.
-- **Script minimalista** — meno di 60 righe di Python, zero dipendenze oltre a `requests`.
+## GitHub Actions
 
------
+Il workflow [`.github/workflows/start.yml`](.github/workflows/start.yml):
 
-## Sorgenti immagini
+- è avviabile **solo manualmente** con `workflow_dispatch`;
+- usa Python 3.12;
+- installa `requests` da `requirements.txt`;
+- richiede permessi repository in sola lettura;
+- impedisce esecuzioni sovrapposte tramite un concurrency group;
+- ha un timeout di 10 minuti.
 
-|Quotidiano          |CDN                         |
-|--------------------|----------------------------|
-|Tuttosport          |`cdn.tuttosport.com`        |
-|Gazzetta dello Sport|`images2.gazzettaobjects.it`|
-|Corriere dello Sport|`cdn.corrieredellosport.it` |
-
------
-
-## Formato del messaggio
-
-```
-📰☀️ PRIME PAGINE | GG/MM/AAAA
-
-👉 @Juventus_Reborn
-```
-
-*(didascalia sulla prima foto dell’album)*
-
------
-
-## Struttura del repository
-
-```
-PrimePagine_JR/
-├── bot.py                    # Script principale
-├── requirements.txt          # Dipendenze Python (solo requests)
-└── .github/workflows/
-    └── start.yml             # Workflow GitHub Actions
-```
-
------
+Nel repository non è configurato uno schedule. Per la pubblicazione quotidiana occorre aggiungere un trigger cron o avviare il workflow tramite un servizio esterno.
 
 ## Configurazione
 
-In **Settings → Secrets and variables → Actions** aggiungi:
+In **Settings → Secrets and variables → Actions** configura:
 
-|Secret            |Descrizione                        |
-|------------------|-----------------------------------|
-|`TELEGRAM_TOKEN`  |Token del bot Telegram.            |
-|`TELEGRAM_CHAT_ID`|Chat ID del canale di destinazione.|
+| Secret | Obbligatorio | Uso |
+|---|---:|---|
+| `TELEGRAM_TOKEN` | sì | Token del bot Telegram. |
+| `TELEGRAM_CHAT_ID` | sì | Chat o canale di destinazione. |
 
------
+Non servono chiavi API per i quotidiani.
 
 ## Avvio
 
-1. Fai il **fork** del repository.
-1. Configura i due secret elencati sopra.
-1. Avvia il workflow da `Actions → Invia Prime Pagine Giornaliere → Run workflow`.
+### Da GitHub
 
-> Per automatizzare l’invio ogni mattina, aggiungi uno schedule cron al workflow:
-> 
-> ```yaml
-> on:
->   schedule:
->     - cron: '30 5 * * *'   # ogni giorno alle 05:30 UTC (07:30 ora italiana)
->   workflow_dispatch:
-> ```
+Apri **Actions → Invia Prime Pagine Giornaliere → Run workflow**.
 
------
+### In locale
 
-## Stack tecnico
+```bash
+python -m pip install -r requirements.txt
+python bot.py
+```
 
-`Python 3.12` · `requests` · `GitHub Actions`
+Prima dell’avvio esporta `TELEGRAM_TOKEN` e `TELEGRAM_CHAT_ID`.
 
------
+## Struttura
 
-<div align="center">
+```text
+PrimePagine_JR/
+├── bot.py
+├── requirements.txt
+└── .github/workflows/
+    └── start.yml
+```
 
-*Progetto amatoriale. Non affiliato con la Juventus FC, Telegram o i quotidiani citati.*
+## Limiti noti
 
-</div>
+- La disponibilità delle copertine dipende da URL esterni non garantiti come API stabili.
+- Telegram scarica le immagini dagli URL indicati: se un CDN non è raggiungibile, l’intero album può fallire.
+- La richiesta di invio non imposta un timeout e gli errori vengono stampati nei log senza forzare sempre il fallimento del processo.
+- Il codice non valida esplicitamente i secret prima di costruire la richiesta Telegram.
+
+---
+
+Progetto amatoriale, non affiliato con Juventus FC, Telegram o i quotidiani citati.
