@@ -1,82 +1,58 @@
+<div align="center">
+
 # 📰☀️ PrimePagine JR
 
-Bot Telegram che pubblica in un unico album le prime pagine di:
+**Bot Telegram che pubblica ogni giorno le prime pagine dei tre quotidiani sportivi italiani.**
 
-- Tuttosport;
-- La Gazzetta dello Sport;
-- Corriere dello Sport.
+[![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![GitHub Actions](https://github.com/Tommaso20BW/PrimePagine_JR/actions/workflows/start.yml/badge.svg)](https://github.com/Tommaso20BW/PrimePagine_JR/actions/workflows/start.yml)
 
-Le immagini vengono referenziate direttamente dai CDN dei quotidiani; il bot non le salva nel repository.
+</div>
+
+## Panoramica
+
+PrimePagine JR raccoglie in un solo album Telegram le copertine di:
+
+1. Tuttosport;
+2. La Gazzetta dello Sport;
+3. Corriere dello Sport.
+
+Le immagini non vengono scaricate né salvate nel repository: Telegram le recupera direttamente dagli URL pubblici dei rispettivi CDN.
 
 ## Come funziona
 
-1. Se il processo parte nei 15 minuti precedenti le **07:00 (Europe/Rome)**, attende l’orario esatto. Se parte prima, dopo o con un ritardo maggiore, procede subito.
-2. Costruisce i tre URL delle copertine aggiungendo un parametro anti-cache basato su data, ora e un numero casuale.
-3. Prepara un album Telegram con `sendMediaGroup`.
-4. Inserisce sulla prima foto una didascalia HTML con la data corrente e `@Juventus_Reborn`.
-5. Invia le immagini nell’ordine Tuttosport, Gazzetta, Corriere.
-
 ```text
-GitHub Actions / esecuzione locale
-                │
-                ▼
+GitHub Actions o esecuzione locale
+                ↓
               bot.py
         ┌───────┼────────┐
-        ▼       ▼        ▼
-   Tuttosport Gazzetta Corriere CDN
+        ↓       ↓        ↓
+   Tuttosport Gazzetta Corriere
         └───────┼────────┘
-                ▼
-       Telegram sendMediaGroup
+                ↓
+      Telegram sendMediaGroup
 ```
+
+Ogni esecuzione:
+
+1. controlla l'orario in `Europe/Rome`;
+2. se parte nei 15 minuti precedenti le **07:00**, attende l'orario esatto;
+3. aggiunge agli URL un parametro anti-cache composto da data, ora e un numero casuale;
+4. costruisce un album con `sendMediaGroup`;
+5. inserisce sulla prima immagine la data e la firma `@Juventus_Reborn`;
+6. invia le tre copertine nell'ordine indicato sopra.
+
+Se il processo parte più di 15 minuti prima, dopo le 07:00 o in ritardo, procede immediatamente.
 
 ## Sorgenti
 
 | Quotidiano | Host |
-|---|---|
+| --- | --- |
 | Tuttosport | `cdn.tuttosport.com` |
 | La Gazzetta dello Sport | `images2.gazzettaobjects.it` |
 | Corriere dello Sport | `cdn.corrieredellosport.it` |
 
-Gli URL sono definiti come costanti in `bot.py` e possono essere aggiornati se i quotidiani cambiano percorso.
-
-## GitHub Actions
-
-Il workflow [`.github/workflows/start.yml`](.github/workflows/start.yml):
-
-- è avviabile **solo manualmente** con `workflow_dispatch`;
-- usa Python 3.12;
-- installa `requests` da `requirements.txt`;
-- richiede permessi repository in sola lettura;
-- impedisce esecuzioni sovrapposte tramite un concurrency group;
-- ha un timeout di 10 minuti.
-
-Nel repository non è configurato uno schedule. Per la pubblicazione quotidiana occorre aggiungere un trigger cron o avviare il workflow tramite un servizio esterno.
-
-## Configurazione
-
-In **Settings → Secrets and variables → Actions** configura:
-
-| Secret | Obbligatorio | Uso |
-|---|---:|---|
-| `TELEGRAM_TOKEN` | sì | Token del bot Telegram. |
-| `TELEGRAM_CHAT_ID` | sì | Chat o canale di destinazione. |
-
-Non servono chiavi API per i quotidiani.
-
-## Avvio
-
-### Da GitHub
-
-Apri **Actions → Invia Prime Pagine Giornaliere → Run workflow**.
-
-### In locale
-
-```bash
-python -m pip install -r requirements.txt
-python bot.py
-```
-
-Prima dell’avvio esporta `TELEGRAM_TOKEN` e `TELEGRAM_CHAT_ID`.
+Gli URL sono costanti definite in `bot.py`. Se un quotidiano cambia il percorso della copertina, occorre aggiornare il relativo valore.
 
 ## Struttura
 
@@ -88,13 +64,69 @@ PrimePagine_JR/
     └── start.yml
 ```
 
+## Requisiti
+
+- Python 3.14, come nel workflow GitHub Actions;
+- accesso ai tre CDN e alla Telegram Bot API.
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+## Configurazione
+
+Configura in **Settings → Secrets and variables → Actions**:
+
+| Secret | Uso |
+| --- | --- |
+| `TELEGRAM_TOKEN` | Token del bot Telegram |
+| `TELEGRAM_CHAT_ID` | Chat o canale di destinazione |
+
+Non servono chiavi API per i quotidiani.
+
+## Avvio locale
+
+### Linux e macOS
+
+```bash
+export TELEGRAM_TOKEN="..."
+export TELEGRAM_CHAT_ID="..."
+python bot.py
+```
+
+### PowerShell
+
+```powershell
+$env:TELEGRAM_TOKEN = "..."
+$env:TELEGRAM_CHAT_ID = "..."
+python bot.py
+```
+
+Per cambiare l'orario modifica `ORA_INVIO` in `bot.py`.
+
+## GitHub Actions
+
+Il workflow `.github/workflows/start.yml`:
+
+- è avviabile manualmente con `workflow_dispatch`;
+- usa Python 3.14;
+- installa Requests e `tzdata`;
+- ha un timeout di 10 minuti;
+- annulla un run precedente dello stesso gruppo se ne parte uno nuovo;
+- usa permessi di sola lettura per il contenuto del repository;
+- elimina i propri run completati dalla cronologia.
+
+Nel repository non è presente uno `schedule`. Per una pubblicazione quotidiana occorre avviare il workflow tramite un servizio esterno o aggiungere una pianificazione.
+
 ## Limiti noti
 
-- La disponibilità delle copertine dipende da URL esterni non garantiti come API stabili.
-- Telegram scarica le immagini dagli URL indicati: se un CDN non è raggiungibile, l’intero album può fallire.
-- La richiesta di invio non imposta un timeout e gli errori vengono stampati nei log senza forzare sempre il fallimento del processo.
-- Il codice non valida esplicitamente i secret prima di costruire la richiesta Telegram.
+- I percorsi dei CDN non sono API stabili e possono cambiare.
+- Se Telegram non riesce a scaricare anche una sola immagine, l'intero album può essere rifiutato.
+- La richiesta `sendMediaGroup` non imposta un timeout.
+- Il codice non valida esplicitamente i secret prima di costruire la richiesta.
+- Errori HTTP o di rete vengono stampati nei log, ma non forzano attualmente il fallimento del processo.
 
 ---
 
-Progetto amatoriale, non affiliato con Juventus FC, Telegram o i quotidiani citati.
+Progetto amatoriale, non affiliato con Juventus Football Club, Telegram o i quotidiani citati.
