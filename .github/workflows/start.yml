@@ -1,4 +1,4 @@
-name: Invia Prime Pagine Giornaliere
+name: Prime Pagine
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ concurrency:
 jobs:
   run-bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 20
 
     steps:
       - name: Controlla il codice della repository
@@ -40,7 +40,13 @@ jobs:
         run: python -u bot.py
 
       - name: Salva lo stato degli hash
+        if: always()
         run: |
+          if [ ! -f state.json ]; then
+            echo "state.json non presente. Nessuno stato da salvare."
+            exit 0
+          fi
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
@@ -67,4 +73,5 @@ jobs:
             echo "Elimino run $RUN_ID"
             gh api -X DELETE "repos/${{ github.repository }}/actions/runs/$RUN_ID" || true
           done
+
           echo "Pulizia completata."
