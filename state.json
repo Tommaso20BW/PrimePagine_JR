@@ -1,9 +1,9 @@
 {
   "hashes": {
-    "tuttosport": "359107ade34950a38af36017888fcf8669b5ebca4f89398ae17309607039d82f",
-    "gazzetta": "cc14fbfae2e93a04a1caf395d5aaa602f27bba2f72bf70b82ffa070ed77dba17",
-    "corriere": "d43d2c6cf64d6332240ac3bec60f10cba34397be5c5506d0f1fb4164381c2340"
+    "tuttosport": "cfe666e8275599d610eb2730b1f09af20cefe26ce02d08b94d00a561c6e37570",
+    "gazzetta": "8fb99c58663f3e51f416861641a566a27f118b9edb0813dfe13981529be5b475",
+    "corriere": "d39dd50ee376ce480c8a1dfa26cbfa8ad9e15deeb11c77010768d4ae4732ed32"
   },
-  "ultima_data_controllo": "2026-11-12",
-  "ultima_data_invio": "2026-11-12"
+  "ultima_data_controllo": "2026-11-13",
+  "ultima_data_invio": "2026-11-13"
 }
