@@ -319,9 +319,6 @@ def main():
 
         risultati.append(risultato)
 
-    for risultato in risultati:
-        stato["hashes"][risultato["chiave"]] = risultato["hash"]
-
     stato["ultima_data_controllo"] = (
         adesso_italia().strftime("%Y-%m-%d")
     )
@@ -341,6 +338,11 @@ def main():
     )
 
     invia_album(risultati)
+
+    # Solo dopo l'invio: se Telegram fallisce o un giornale è in ritardo,
+    # il rilancio vede ancora le prime pagine come nuove e le manda.
+    for risultato in risultati:
+        stato["hashes"][risultato["chiave"]] = risultato["hash"]
 
     stato["ultima_data_invio"] = (
         adesso_italia().strftime("%Y-%m-%d")
